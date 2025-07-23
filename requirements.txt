@@ -1,5 +1,8 @@
-discord.py
 flask
-pytz
-aiohttp
 flask_sqlalchemy
+sqlalchemy
+werkzeug
+gunicorn
+discord.py
+python-dotenv
+apscheduler
