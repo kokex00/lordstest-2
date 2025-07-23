@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}About - Discord Server Manager Bot{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fab fa-discord me-2"></i>About Discord Server Manager Bot
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fab fa-discord fa-4x text-primary mb-3"></i>
+                    <h4>Professional Discord Server Management</h4>
+                    <p class="lead text-muted">
+                        A comprehensive bot for server administration, match scheduling, and community management.
+                    </p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h5><i class="fas fa-star me-2"></i>Key Features</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Match scheduling with automatic reminders
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Multi-language support (EN, PT, ES)
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Advanced moderation tools
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Channel and role management
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Private messaging with translation
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Comprehensive activity logging
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <h5><i class="fas fa-cogs me-2"></i>Technical Details</h5>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Framework:</span>
+                                <strong>Flask + Discord.py</strong>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Database:</span>
+                                <strong>SQLAlchemy</strong>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Frontend:</span>
+                                <strong>Bootstrap + Chart.js</strong>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Commands:</span>
+                                <strong>20+ Slash Commands</strong>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between">
+                                <span>Version:</span>
+                                <span class="badge bg-success">1.0.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <i class="fas fa-futbol fa-2x text-primary mb-2"></i>
+                                <h6>Match Management</h6>
+                                <p class="small text-muted mb-0">Schedule matches with automatic reminders and translations</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                                <h6>Moderation Tools</h6>
+                                <p class="small text-muted mb-0">Complete set of moderation commands for server security</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <i class="fas fa-language fa-2x text-info mb-2"></i>
+                                <h6>Multi-Language</h6>
+                                <p class="small text-muted mb-0">Support for English, Portuguese, and Spanish</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <h5 class="mb-3">Created by kokex</h5>
+                    <p class="text-muted mb-3">
+                        A professional Discord bot designed for modern server management needs.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('dashboard.support') }}" class="btn btn-primary">
+                            <i class="fas fa-headset me-2"></i>Get Support
+                        </a>
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

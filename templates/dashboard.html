@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Discord Bot Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="fas fa-tachometer-alt me-3"></i>
+            Dashboard
+        </h1>
+        <p class="lead">Welcome to the Discord Server Manager Bot dashboard</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="fas fa-server fa-3x text-primary mb-3"></i>
+                <h3 class="card-title">{{ total_servers }}</h3>
+                <p class="card-text">Active Servers</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="fas fa-futbol fa-3x text-success mb-3"></i>
+                <h3 class="card-title">{{ active_matches }}</h3>
+                <p class="card-text">Active Matches</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <i class="fas fa-robot fa-3x text-info mb-3"></i>
+                <h3 class="card-title" id="bot-status">Online</h3>
+                <p class="card-text">Bot Status</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Activity Overview
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Recent Logs
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if recent_logs %}
+                    <div class="list-group list-group-flush">
+                        {% for log in recent_logs %}
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>/{{ log.command }}</strong>
+                                    <br>
+                                    <small class="text-muted">by {{ log.username }}</small>
+                                </div>
+                                <small class="text-muted">{{ log.timestamp.strftime('%H:%M') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('dashboard.logs') }}" class="btn btn-sm btn-outline-secondary">
+                            View All Logs
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                        <p>No recent activity</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('dashboard.matches') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-futbol me-2"></i>
+                            View Matches
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('dashboard.logs') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-file-alt me-2"></i>
+                            View Logs
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ url_for('dashboard.stats') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Statistics
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-outline-warning w-100" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-2"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize activity chart
+const ctx = document.getElementById('activityChart').getContext('2d');
+const activityChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Commands Used',
+            data: [],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Load activity data
+async function loadActivityData() {
+    try {
+        const response = await fetch('/api/activity?days=7');
+        const data = await response.json();
+        
+        activityChart.data.labels = data.map(item => 
+            new Date(item.date).toLocaleDateString()
+        ).reverse();
+        activityChart.data.datasets[0].data = data.map(item => item.logs).reverse();
+        activityChart.update();
+    } catch (error) {
+        console.error('Error loading activity data:', error);
+    }
+}
+
+// Refresh dashboard data
+async function refreshData() {
+    const refreshBtn = document.querySelector('button[onclick="refreshData()"]');
+    const originalText = refreshBtn.innerHTML;
+    
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Refreshing...';
+    refreshBtn.disabled = true;
+    
+    try {
+        await loadActivityData();
+        // Add more refresh logic here
+        
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+        }, 1000);
+    } catch (error) {
+        console.error('Error refreshing data:', error);
+        refreshBtn.innerHTML = originalText;
+        refreshBtn.disabled = false;
+    }
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadActivityData();
+});
+</script>
+{% endblock %}

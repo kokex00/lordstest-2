@@ -1,0 +1,196 @@
+/* Custom styles for Discord Bot Manager */
+
+:root {
+    --discord-blurple: #5865F2;
+    --discord-green: #57F287;
+    --discord-yellow: #FEE75C;
+    --discord-fuchsia: #EB459E;
+    --discord-red: #ED4245;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+/* Status indicators */
+.status-online {
+    color: var(--discord-green);
+}
+
+.status-idle {
+    color: var(--discord-yellow);
+}
+
+.status-dnd {
+    color: var(--discord-red);
+}
+
+.status-offline {
+    color: var(--bs-secondary);
+}
+
+/* Custom buttons */
+.btn-discord {
+    background-color: var(--discord-blurple);
+    border-color: var(--discord-blurple);
+    color: white;
+}
+
+.btn-discord:hover {
+    background-color: #4752C4;
+    border-color: #4752C4;
+    color: white;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Code blocks */
+code {
+    font-size: 0.875em;
+    color: var(--bs-info);
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+}
+
+/* Custom scrollbar */
+.card-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.card-body::-webkit-scrollbar-track {
+    background: var(--bs-secondary-bg);
+    border-radius: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+    background: var(--bs-secondary);
+    border-radius: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-secondary-color);
+}
+
+/* Animation for live updates */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(88, 101, 242, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(88, 101, 242, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(88, 101, 242, 0);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+footer a {
+    color: var(--discord-blurple);
+}
+
+footer a:hover {
+    color: #4752C4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* Dark theme specific adjustments */
+[data-bs-theme="dark"] .table > :not(caption) > * > * {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .border-start {
+    border-left-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-bs-theme="dark"] .border-primary {
+    border-left-color: var(--discord-blurple) !important;
+}
+
+[data-bs-theme="dark"] .border-warning {
+    border-left-color: var(--discord-yellow) !important;
+}
+
+/* Live activity indicator */
+.live-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--discord-green);
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+/* Enhanced card headers */
+.card-header {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-bottom: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+}
+
+/* Custom list group styles */
+.list-group-item {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Matches - Discord Bot Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="fas fa-futbol me-3"></i>
+            Matches
+        </h1>
+        <p class="lead">View all scheduled and completed matches</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    All Matches
+                </h5>
+                <span class="badge bg-secondary">{{ matches.total }} total</span>
+            </div>
+            <div class="card-body">
+                {% if matches.items %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Teams</th>
+                                    <th>Date & Time</th>
+                                    <th>Server</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for match in matches.items %}
+                                <tr>
+                                    <td>
+                                        <code>{{ match.id }}</code>
+                                    </td>
+                                    <td>
+                                        <strong>{{ match.team1 }}</strong>
+                                        <small class="text-muted">vs</small>
+                                        <strong>{{ match.team2 }}</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ match.match_date.strftime('%Y-%m-%d') }}
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ match.match_date.strftime('%H:%M UTC') }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 150px;" title="{{ match.server.guild_name }}">
+                                            {{ match.server.guild_name }}
+                                        </div>
+                                        <small class="text-muted">{{ match.server.guild_id }}</small>
+                                    </td>
+                                    <td>
+                                        {% if match.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Ended</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ match.created_at.strftime('%m/%d %H:%M') }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if matches.pages > 1 %}
+                    <nav aria-label="Matches pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if matches.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('dashboard.matches', page=matches.prev_num) }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in matches.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != matches.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('dashboard.matches', page=page_num) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if matches.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('dashboard.matches', page=matches.next_num) }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-futbol fa-3x mb-3 opacity-50"></i>
+                        <h5>No matches found</h5>
+                        <p>Matches will appear here once they are created through Discord bot commands.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Upcoming Matches
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="upcoming-matches">
+                    <div class="text-center">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Match Commands
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>/create_match</strong>
+                    <p class="small text-muted mb-2">Create a new match with teams and schedule</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>/list_matches</strong>
+                    <p class="small text-muted mb-2">List all active matches for the server</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>/end_match</strong>
+                    <p class="small text-muted mb-2">End a match by its ID</p>
+                </div>
+                
+                <hr>
+                
+                <p class="small text-muted mb-0">
+                    Use these commands in Discord to manage matches. 
+                    The bot will automatically send reminders and notifications.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadUpcomingMatches() {
+    try {
+        const response = await fetch('/api/matches/upcoming?limit=5');
+        const matches = await response.json();
+        
+        const container = document.getElementById('upcoming-matches');
+        
+        if (matches.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted">
+                    <i class="fas fa-calendar-times fa-2x mb-2 opacity-50"></i>
+                    <p>No upcoming matches</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        matches.forEach(match => {
+            const matchDate = new Date(match.match_date);
+            const isToday = matchDate.toDateString() === new Date().toDateString();
+            
+            html += `
+                <div class="border-start border-3 ${isToday ? 'border-warning' : 'border-primary'} ps-3 mb-3">
+                    <div class="fw-bold">${match.team1} vs ${match.team2}</div>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>
+                        ${matchDate.toLocaleDateString()} ${matchDate.toLocaleTimeString()}
+                    </small>
+                    <br>
+                    <small class="text-muted">
+                        <i class="fas fa-server me-1"></i>
+                        ${match.server}
+                    </small>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error loading upcoming matches:', error);
+        document.getElementById('upcoming-matches').innerHTML = `
+            <div class="text-center text-danger">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Error loading matches
+            </div>
+        `;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadUpcomingMatches();
+});
+</script>
+{% endblock %}

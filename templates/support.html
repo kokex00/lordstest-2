@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Support - Discord Server Manager Bot{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-headset me-2"></i>Support & Contact
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-user me-2"></i>Creator Information</h5>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Creator:</span>
+                                <a href="https://discord.com/users/{{ support.discord_id }}" target="_blank" class="text-info text-decoration-none">
+                                    <strong><i class="fab fa-discord me-1"></i>{{ support.creator }}</strong>
+                                </a>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Contact:</span>
+                                <a href="https://discord.com/users/{{ support.discord_id }}" target="_blank" class="text-info text-decoration-none">
+                                    <strong>{{ support.creator }}</strong>
+                                </a>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Discord Profile:</span>
+                                <a href="https://discord.com/users/{{ support.discord_id }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fab fa-discord me-1"></i>Open Profile
+                                </a>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Bot Version:</span>
+                                <span class="badge bg-success">{{ support.bot_version }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-question-circle me-2"></i>How to Get Support</h5>
+                        <ol class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-mouse-pointer text-primary me-2"></i>
+                                Click on <strong>kokex</strong> to open Discord profile
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-user-plus text-info me-2"></i>
+                                Add as friend or send direct message
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-server text-warning me-2"></i>
+                                Include your server ID and bot permissions
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-bug text-danger me-2"></i>
+                                Describe the problem in detail
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h5><i class="fas fa-star me-2"></i>Bot Features</h5>
+                <div class="row">
+                    {% for feature in support.features %}
+                    <div class="col-md-6 mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>{{ feature }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="alert alert-info" role="alert">
+                    <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Need Help?</h6>
+                    <p class="mb-0">
+                        If you're experiencing issues with the bot, make sure it has the necessary permissions in your server. 
+                        For match scheduling, ensure roles are mentionable and the bot can send DMs to users.
+                    </p>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

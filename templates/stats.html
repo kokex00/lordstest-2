@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - Discord Server Manager Bot{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="fas fa-chart-bar me-2"></i>Bot Statistics
+        </h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="h2 text-primary mb-0">{{ stats.total_servers }}</div>
+                <div class="text-muted">Total Servers</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="h2 text-success mb-0">{{ stats.active_matches }}</div>
+                <div class="text-muted">Active Matches</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="h2 text-info mb-0">{{ stats.total_commands }}</div>
+                <div class="text-muted">Commands Used</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <div class="h2 text-warning mb-0">{{ stats.pending_reminders }}</div>
+                <div class="text-muted">Pending Reminders</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-trophy me-2"></i>Top Commands
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="commandsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>Activity Timeline
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>Command Usage Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Usage Count</th>
+                                <th>Last Used</th>
+                                <th>Most Active Server</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for command in top_commands %}
+                            <tr>
+                                <td>
+                                    <code>/{{ command.command_name }}</code>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ command.count }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ command.last_used.strftime('%Y-%m-%d %H:%M') if command.last_used else 'Never' }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-info">Server ID: {{ command.server_id or 'N/A' }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Commands Chart
+const ctx1 = document.getElementById('commandsChart').getContext('2d');
+const commandsChart = new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for cmd in top_commands %}'{{ cmd.command_name }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for cmd in top_commands %}{{ cmd.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: [
+                '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8',
+                '#6610f2', '#e83e8c', '#fd7e14', '#20c997', '#6f42c1'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Activity Chart
+const ctx2 = document.getElementById('activityChart').getContext('2d');
+const activityChart = new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: [{% for data in activity_data %}'{{ data.date }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Commands Used',
+            data: [{% for data in activity_data %}{{ data.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

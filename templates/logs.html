@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - Discord Bot Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="fas fa-file-alt me-3"></i>
+            Bot Logs
+        </h1>
+        <p class="lead">Monitor all bot activities and command usage</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-filter me-2"></i>
+                    Filters
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('dashboard.logs') }}">
+                    <div class="mb-3">
+                        <label for="guild_id" class="form-label">Server</label>
+                        <select class="form-select" id="guild_id" name="guild_id">
+                            <option value="">All Servers</option>
+                            {% for server in servers %}
+                            <option value="{{ server.guild_id }}" {% if server.guild_id == selected_guild %}selected{% endif %}>
+                                {{ server.guild_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>
+                        Apply Filters
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Command Logs
+                </h5>
+                <span class="badge bg-secondary">{{ logs.total }} total</span>
+            </div>
+            <div class="card-body">
+                {% if logs.items %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Command</th>
+                                    <th>Channel</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs.items %}
+                                <tr>
+                                    <td>
+                                        <div>{{ log.timestamp.strftime('%Y-%m-%d') }}</div>
+                                        <small class="text-muted">{{ log.timestamp.strftime('%H:%M:%S') }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">{{ log.username }}</div>
+                                        <small class="text-muted font-monospace">{{ log.user_id }}</small>
+                                    </td>
+                                    <td>
+                                        <code>/{{ log.command }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="font-monospace">#{{ log.channel_id }}</span>
+                                    </td>
+                                    <td>
+                                        {% if log.details %}
+                                            <div class="text-truncate" style="max-width: 200px;" title="{{ log.details }}">
+                                                {{ log.details }}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {% if logs.pages > 1 %}
+                    <nav aria-label="Logs pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if logs.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('dashboard.logs', page=logs.prev_num, guild_id=selected_guild) }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in logs.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != logs.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('dashboard.logs', page=page_num, guild_id=selected_guild) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if logs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('dashboard.logs', page=logs.next_num, guild_id=selected_guild) }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-file-alt fa-3x mb-3 opacity-50"></i>
+                        <h5>No logs found</h5>
+                        <p>Command logs will appear here as users interact with the bot.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time logs section -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-broadcast-tower me-2"></i>
+                    Live Activity
+                </h5>
+                <div>
+                    <span class="badge bg-success" id="live-status">Live</span>
+                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="toggleLiveUpdates()">
+                        <i class="fas fa-pause" id="live-toggle-icon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="live-logs" style="max-height: 300px; overflow-y: auto;">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-satellite-dish fa-2x mb-2"></i>
+                        <p>Waiting for new activity...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let liveUpdatesEnabled = true;
+let lastLogId = 0;
+
+async function checkForNewLogs() {
+    if (!liveUpdatesEnabled) return;
+    
+    try {
+        // This would be a real-time endpoint in a production app
+        // For now, we'll simulate by checking recent logs
+        const response = await fetch('/api/logs/recent');
+        if (response.ok) {
+            const logs = await response.json();
+            
+            // Update live logs display
+            updateLiveLogs(logs);
+        }
+    } catch (error) {
+        console.error('Error checking for new logs:', error);
+    }
+}
+
+function updateLiveLogs(logs) {
+    const container = document.getElementById('live-logs');
+    
+    if (logs.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted">
+                <i class="fas fa-satellite-dish fa-2x mb-2"></i>
+                <p>Waiting for new activity...</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    logs.slice(0, 10).forEach(log => {
+        const timestamp = new Date(log.timestamp).toLocaleTimeString();
+        html += `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <div>
+                    <strong>/${log.command}</strong> by ${log.username}
+                    ${log.details ? `<br><small class="text-muted">${log.details}</small>` : ''}
+                </div>
+                <small class="text-muted">${timestamp}</small>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function toggleLiveUpdates() {
+    liveUpdatesEnabled = !liveUpdatesEnabled;
+    
+    const statusBadge = document.getElementById('live-status');
+    const toggleIcon = document.getElementById('live-toggle-icon');
+    
+    if (liveUpdatesEnabled) {
+        statusBadge.textContent = 'Live';
+        statusBadge.className = 'badge bg-success';
+        toggleIcon.className = 'fas fa-pause';
+    } else {
+        statusBadge.textContent = 'Paused';
+        statusBadge.className = 'badge bg-warning';
+        toggleIcon.className = 'fas fa-play';
+    }
+}
+
+// Check for new logs every 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setInterval(checkForNewLogs, 5000);
+    checkForNewLogs(); // Initial check
+});
+</script>
+{% endblock %}
