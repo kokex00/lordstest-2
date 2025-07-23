@@ -46,7 +46,5 @@ def start_bot():
     from bot import run_bot
     run_bot()
 
-if __name__ != "__main__":
-    # Start bot when running through gunicorn or similar
-    bot_thread = threading.Thread(target=start_bot, daemon=True)
-    bot_thread.start()
+bot_thread = threading.Thread(target=start_bot, daemon=True)
+bot_thread.start()
