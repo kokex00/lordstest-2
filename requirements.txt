@@ -2,6 +2,8 @@ flask
 flask_sqlalchemy
 sqlalchemy
 werkzeug
+gunicorn
 discord.py
+python-dotenv
 apscheduler
-pytz
+pytz==2023.3
