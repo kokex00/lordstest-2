@@ -104,7 +104,7 @@ async def on_ready():
 logging.info(f'{bot.user} has connected to Discord!')
 
 # Set bot status  
-await bot.change_presence(activity=discord.Game(name="Server Management | Made by kokex | Dashboard: tinyurl.com/kokex-bot"))  
+await bot.change_presence(activity=discord.Game(name="Server Management | Made by kokex"))  
   
 # Start the scheduler  
 scheduler.start()  
